@@ -17,68 +17,69 @@ public class MakeAccountList {
     }
 
     private void setAccounts() {
+        LocalDate now = LocalDate.now();
         var account1 = new Account(101, 1,
                 new Money(Currency.UAH, 64000),
-                LocalDate.of(2023, 11, 26),
-                LocalDate.of(2025, 12, 26));
+                now.minusYears(1),
+                now.plusYears(1));
         var account2 = new Account(102, 2,
                 new Money(Currency.UAH, 458600),
-                LocalDate.of(2021, 6, 12),
-                LocalDate.of(2024, 6, 12));
+                now.minusYears(3),
+                now.minusMonths(6));
         var account3 = new Account(103, 3,
                 new Money(Currency.UAH, 856400),
-                LocalDate.of(2022, 8, 25),
-                LocalDate.of(2024, 8, 25)
+                now.minusYears(2),
+                now.minusMonths(4)
         );
         var account4 = new Account(104, 4,
                 new Money(Currency.UAH, 4569500),
-                LocalDate.of(2024, 10, 22),
-                LocalDate.of(2025, 10, 22)
+                now.minusMonths(2),
+                now.plusMonths(6)
         );
         var account5 = new Account(105, 5,
                 new Money(Currency.UAH, 2350000),
-                LocalDate.of(2024, 10, 20),
-                LocalDate.of(2025, 10, 20)
+                now.minusMonths(2),
+                now.minusMonths(10)
         );
         var account6 = new Account(106, 6,
                 new Money(Currency.UAH, 2536000),
-                LocalDate.of(2022, 6, 19),
-                LocalDate.of(2024, 12, 19)
+                now.minusYears(2),
+                LocalDate.of(now.getYear(), now.getMonth(), 19)
         );
         var account7 = new Account(107, 7,
                 new Money(Currency.UAH, 256000),
-                LocalDate.of(2024, 7, 12),
-                LocalDate.of(2026, 7, 12)
+                now.minusMonths(6),
+                now.plusYears(2)
         );
         var account8 = new Account(108, 8,
                 new Money(Currency.UAH, 2310000),
-                LocalDate.of(2022, 4, 15),
-                LocalDate.of(2024, 4, 15)
+                now.minusYears(2),
+                now.minusMonths(6)
         );
         var account9 = new Account(109, 9,
                 new Money(Currency.UAH, 8690000),
-                LocalDate.of(2024, 6, 11),
-                LocalDate.of(2025, 6, 11)
+                now.minusMonths(6),
+                now.plusMonths(6)
         );
         var account10 = new Account(110, 1,
                 new Money(Currency.USD, 50500),
-                LocalDate.of(2024, 12, 12),
-                LocalDate.of(2025, 12, 12)
+                now,
+                now.plusYears(1)
         );
         var account11 = new Account(111, 5,
                 new Money(Currency.USD, 23500),
-                LocalDate.of(2020, 7, 23),
-                LocalDate.of(2024, 12, 23)
+                now.minusYears(4),
+                now
         );
         var account12 = new Account(112, 9,
                 new Money(Currency.USD, 70000),
-                LocalDate.of(2024, 1, 13),
-                LocalDate.of(2026, 1, 13)
+                now.minusYears(1),
+                now.plusYears(2)
         );
         var account13 = new Account(113, 9,
                 new Money(Currency.EUR, 30000),
-                LocalDate.of(2024, 2, 15),
-                LocalDate.of(2026, 2, 15)
+                now.minusMonths(10),
+                now.plusYears(2)
         );
 
         accounts.add(account1);

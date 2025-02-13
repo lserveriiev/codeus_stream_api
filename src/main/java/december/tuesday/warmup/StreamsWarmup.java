@@ -5,10 +5,13 @@ import december.tuesday.helper_classes.Currency;
 import december.tuesday.helper_classes.CurrentNbuRate;
 import december.tuesday.helper_classes.Money;
 import december.tuesday.helper_classes.User;
-import errors.TaskNotCompleteException;
 
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Exercises for improving Stream API knowledge.
@@ -16,6 +19,14 @@ import java.util.Map;
  * <br> List of accounts {@link Account} and list of user {@link User} are not empty.
  */
 public class StreamsWarmup {
+
+    private static Predicate<Account> withCurrentMonthPredicate() {
+        LocalDate now = LocalDate.now();
+
+        return a ->
+                (a.closingDate().getMonth().getValue() == now.getMonth().getValue())
+                        && (a.closingDate().getYear() == now.getYear());
+    }
 
     /**
      * Get int max raw amount {@link Money#amount()} of account's.
@@ -25,7 +36,11 @@ public class StreamsWarmup {
      * @return max raw amount.
      */
     public int getMaxRawAmount(List<Account> accounts) {
-        throw new TaskNotCompleteException();
+        return accounts
+                .stream()
+                .mapToInt(a -> a.money().amount())
+                .max()
+                .orElseThrow();
     }
 
     /**
@@ -36,7 +51,13 @@ public class StreamsWarmup {
      * @return Map with User's ID as key and List of Account's ID as value.
      */
     public Map<Integer, List<Integer>> getListOfIdAccountsByUserId(List<Account> accounts) {
-        throw new TaskNotCompleteException();
+        return accounts.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                Account::userId,
+                                Collectors.mapping(Account::id, Collectors.toList())
+                        )
+                );
     }
 
     /**
@@ -48,9 +69,10 @@ public class StreamsWarmup {
      * @return double total UAH equivalent.
      */
     public double getTotalUahEquivalentForAllAccounts(List<Account> accounts, CurrentNbuRate rate) {
-        throw new TaskNotCompleteException();
+        return accounts.stream()
+                .mapToDouble(a -> a.money().getUahEquivalent(rate))
+                .reduce(0.0, Double::sum);
     }
-
 
     /**
      * Get the oldest user from a list of Users.
@@ -60,7 +82,9 @@ public class StreamsWarmup {
      * @return oldest user.
      */
     public User getOldestUser(List<User> users) {
-        throw new TaskNotCompleteException();
+        return users.stream()
+                .max(Comparator.comparingInt(User::age))
+                .orElseThrow();
     }
 
     /**
@@ -72,7 +96,12 @@ public class StreamsWarmup {
      * @return list of account IDs.
      */
     public List<Integer> getClosedAccountIds(List<Account> accounts) {
-        throw new TaskNotCompleteException();
+        LocalDate now = LocalDate.now();
+
+        return accounts.stream()
+                .filter(a -> a.closingDate().isBefore(now))
+                .map(Account::id)
+                .toList();
     }
 
     /**
@@ -84,7 +113,14 @@ public class StreamsWarmup {
      * @return Map with user ID as key and list of account IDs as value.
      */
     public Map<Integer, List<Integer>> getUsersIdWithAccountIdWillBeClosedAccount(List<Account> accounts) {
-        throw new TaskNotCompleteException();
+        return accounts.stream()
+                .filter(a -> withCurrentMonthPredicate().test(a))
+                .collect(
+                        Collectors.groupingBy(
+                                Account::userId,
+                                Collectors.mapping(Account::id, Collectors.toList())
+                        )
+                );
     }
 
     /**
@@ -95,7 +131,14 @@ public class StreamsWarmup {
      * @return Map with Currency as the key and max Double Big Amount as value for the Currency.
      */
     public Map<Currency, Double> getMaxBigAmountByCurrency(List<Account> accounts) {
-        throw new TaskNotCompleteException();
+        return accounts.stream()
+                .collect(
+                        Collectors.toMap(
+                                a -> a.money().currency(),
+                                a -> a.money().getBigAmount(),
+                                Math::max
+                        )
+                );
     }
 
     /**
@@ -107,7 +150,16 @@ public class StreamsWarmup {
      * @return User if exists, else null.
      */
     public User getMaxBigAmountUser(List<Account> accounts, List<User> users) {
-        throw new TaskNotCompleteException();
+        int bigAmountUserId = accounts.stream()
+                // .max((a, b) -> Double.compare(a.money().getBigAmount(), b.money().getBigAmount()))
+                .max(Comparator.comparingDouble(a -> a.money().getBigAmount()))
+                .map(Account::userId)
+                .orElseThrow();
+
+        return users.stream()
+                .filter(u -> u.id() == bigAmountUserId)
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -121,7 +173,20 @@ public class StreamsWarmup {
      */
     public Map<User, List<Integer>> getUsersWithAccIDWillBeClosedAccount(List<Account> accounts,
                                                                          List<User> users) {
-        throw new TaskNotCompleteException();
+        Map<Integer, User> userIdToUser = users
+                .stream()
+                .collect(Collectors.toMap(User::id, u -> u));
+
+        return accounts
+                .stream()
+                .filter(a -> withCurrentMonthPredicate().test(a))
+                .collect(
+                        Collectors.groupingBy(
+                                a -> userIdToUser.get(a.userId()),
+                                Collectors.mapping(Account::id, Collectors.toList())
+                        )
+                );
+
     }
 
     /**
@@ -132,7 +197,17 @@ public class StreamsWarmup {
      * @return count of users.
      */
     public int getCountOfUserWithSeveralTypeOfAccount(List<Account> accounts) {
-        throw new TaskNotCompleteException();
+        return (int) accounts.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                Account::userId,
+                                Collectors.mapping(a -> a.money().currency(), Collectors.toSet())
+                        )
+                )
+                .values()
+                .stream()
+                .filter(collection -> collection.size() > 1)
+                .count();
     }
 
     /**
@@ -147,7 +222,26 @@ public class StreamsWarmup {
     public Map<User, Double> getMaxBigAmountInUahEquivalent(List<Account> accounts,
                                                             List<User> users,
                                                             CurrentNbuRate rate) {
-        throw new TaskNotCompleteException();
+        Map<Integer, User> idToUser = users
+                .stream()
+                .collect(Collectors.toMap(User::id, u -> u));
+
+        return accounts
+                // to Map<userId, sum(amountInUah)>
+                .stream()
+                .collect(
+                        Collectors.toMap(
+                                Account::userId,
+                                a -> a.money().getUahEquivalent(rate),
+                                Double::sum
+                        )
+                )
+                .entrySet()
+                .stream()
+                // find max amount
+                .max(Comparator.comparingDouble(Map.Entry::getValue))
+                .map(a -> Map.of(idToUser.get(a.getKey()), a.getValue()))
+                .orElse(Map.of());
     }
 
 }
