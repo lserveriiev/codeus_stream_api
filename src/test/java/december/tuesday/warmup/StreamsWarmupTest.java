@@ -92,7 +92,7 @@ class StreamsWarmupTest {
     @DisplayName("EASY: Check already closed account IDs")
     void checkAlreadyClosedAccountIDs() {
         var actual = streamsWarmup.getClosedAccountIds(accounts);
-        var expected = List.of(102, 103, 108);
+        var expected = List.of(102, 103, 105, 108);
 
         assertEquals(expected, actual);
     }
